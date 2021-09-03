@@ -14,7 +14,14 @@ val `batch-processor` = project
   .settings(scalaVersion := scalaSparkVersion)
   .settings(version := batchProcessorVersion)
   .settings(
-    libraryDependencies := Seq(Libs.spark)
+    libraryDependencies := Seq(
+      Libs.spark,
+      Libs.cats,
+      Libs.catsEffect2,
+      Libs.framelessCore,
+      Libs.framelessCats,
+      Libs.framelessDataset
+    ) ++ Libs.pureConfigCE2
   )
 
 val `ingestion-service` = project
@@ -22,7 +29,16 @@ val `ingestion-service` = project
   .settings(scalaVersion := scalaCoreVersion)
   .settings(version := ingestionServiceVersion)
   .settings(
-    libraryDependencies := Seq()
+    libraryDependencies := Seq(
+      Libs.fs2,
+      Libs.cats,
+      Libs.catsEffect3,
+      Libs.http4sDsl,
+      Libs.http4sServer,
+      Libs.http4sCirce,
+      Libs.pureAwsS3,
+      Libs.pureAwsS3Testing
+    ) ++ Libs.pureConfigCE3
   )
 
 val `query-service` = project
@@ -30,5 +46,13 @@ val `query-service` = project
   .settings(scalaVersion := scalaCoreVersion)
   .settings(version := queryServiceVersion)
   .settings(
-    libraryDependencies := Seq()
+    libraryDependencies := Seq(
+      Libs.cats,
+      Libs.catsEffect3,
+      Libs.http4sDsl,
+      Libs.http4sServer,
+      Libs.http4sCirce,
+      Libs.pureAwsS3,
+      Libs.pureAwsS3Testing
+    ) ++ Libs.pureConfigCE3
   )
