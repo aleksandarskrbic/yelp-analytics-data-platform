@@ -1,13 +1,13 @@
-import Dependencies._
+import dependencies._
 
 name := "yelp-analytics-data-platform"
 
 val scalaCoreVersion  = "2.13.6"
 val scalaSparkVersion = "2.12.14"
 
-val queryServiceVersion     = "0.0.1"
-val batchProcessorVersion   = "0.0.1"
-val ingestionServiceVersion = "0.0.1"
+val queryServiceVersion     = "0.1.0"
+val batchProcessorVersion   = "0.1.0"
+val ingestionServiceVersion = "0.1.0"
 
 val `batch-processor` = project
   .in(file("modules/batch-processor"))
