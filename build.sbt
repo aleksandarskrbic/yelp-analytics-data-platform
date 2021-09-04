@@ -1,4 +1,4 @@
-import dependencies._
+import dependencies.{ Libs, _ }
 
 name := "yelp-analytics-data-platform"
 
@@ -17,11 +17,11 @@ val `batch-processor` = project
     libraryDependencies := Seq(
       Libs.spark,
       Libs.cats,
-      Libs.catsEffect2,
+      Libs.catsEffect,
       Libs.framelessCore,
       Libs.framelessCats,
       Libs.framelessDataset
-    ) ++ Libs.pureConfigCE2
+    ) ++ Libs.pureConfig
   )
 
 val `ingestion-service` = project
@@ -32,13 +32,14 @@ val `ingestion-service` = project
     libraryDependencies := Seq(
       Libs.fs2,
       Libs.cats,
-      Libs.catsEffect3,
+      Libs.catsEffect,
+      Libs.logback,
+      Libs.log4cats,
+      Libs.log4catsSlf4j,
       Libs.http4sDsl,
       Libs.http4sServer,
-      Libs.http4sCirce,
-      Libs.pureAwsS3,
-      Libs.pureAwsS3Testing
-    ) ++ Libs.pureConfigCE3
+      Libs.http4sCirce
+    ) ++ Libs.pureConfig ++ Libs.fs2Aws ++ Libs.fs2AwsS3
   )
 
 val `query-service` = project
@@ -48,11 +49,9 @@ val `query-service` = project
   .settings(
     libraryDependencies := Seq(
       Libs.cats,
-      Libs.catsEffect3,
+      Libs.catsEffect,
       Libs.http4sDsl,
       Libs.http4sServer,
-      Libs.http4sCirce,
-      Libs.pureAwsS3,
-      Libs.pureAwsS3Testing
-    ) ++ Libs.pureConfigCE3
+      Libs.http4sCirce
+    ) ++ Libs.pureConfig ++ Libs.fs2Aws ++ Libs.fs2AwsS3
   )
