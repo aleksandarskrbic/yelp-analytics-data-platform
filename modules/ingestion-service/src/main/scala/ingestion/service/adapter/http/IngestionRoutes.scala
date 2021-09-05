@@ -9,7 +9,7 @@ import org.http4s.multipart._
 
 final class IngestionRoutes[F[_]: Sync](storageService: StorageService[F]) extends Http4sDsl[F] {
 
-  val routes = HttpRoutes.of[F] {
+  val routes: HttpRoutes[F] = HttpRoutes.of[F] {
     case GET -> Root / "ingestion" / bucketName =>
       storageService.createBucketIfNotExists(bucketName).flatMap {
         case Some(bucket) => Ok(bucket.name)
