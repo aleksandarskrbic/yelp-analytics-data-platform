@@ -9,7 +9,7 @@ import ingestion.service.config
 
 import java.net.URI
 
-final case class S3Client[F[_]](s3: S3AsyncClientOp[F], blocker: Blocker)
+final case class S3Client[F[_]](s3: S3AsyncClientOp[F], s3Config: config.S3, blocker: Blocker)
 
 object S3ClientResource {
 
@@ -25,5 +25,5 @@ object S3ClientResource {
                .endpointOverride(URI.create(s3Config.url))
                .region(Region.of(s3Config.region))
            )
-    } yield S3Client(s3, blocker)
+    } yield S3Client(s3, s3Config, blocker)
 }

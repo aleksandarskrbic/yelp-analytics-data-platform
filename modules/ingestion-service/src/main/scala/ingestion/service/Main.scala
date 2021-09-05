@@ -7,8 +7,7 @@ import org.typelevel.log4cats.SelfAwareStructuredLogger
 import ingestion.service.config.AppConfig
 import ingestion.service.adapter.http.IngestionRoutes
 import ingestion.service.adapter.s3.S3ClientResource
-import ingestion.service.domain.service.StorageService
-
+import ingestion.service.domain.service.{ IngestionService, StorageService }
 import java.util.concurrent.Executors
 import scala.concurrent.ExecutionContext
 
@@ -20,13 +19,17 @@ object Main extends IOApp {
     AppConfig.load[IO].flatMap { appConfig =>
       S3ClientResource.make[IO](appConfig.s3).use { s3 =>
         for {
-          storageService <- StorageService.make[IO](s3)
+          storageService   <- StorageService.make[IO](s3)
+          ingestionService <- IngestionService.make[IO](s3)
+
+          _ <- storageService.createBucketIfNotExists(appConfig.s3.bucketName).start
+
           _ <- BlazeServerBuilder[IO](
                 ExecutionContext.fromExecutor(
                   Executors.newFixedThreadPool(4)
                 )
               ).bindHttp(8080, "localhost")
-                .withHttpApp(new IngestionRoutes[IO](storageService).routes.orNotFound)
+                .withHttpApp(new IngestionRoutes[IO](ingestionService).routes.orNotFound)
                 .serve
                 .compile
                 .drain

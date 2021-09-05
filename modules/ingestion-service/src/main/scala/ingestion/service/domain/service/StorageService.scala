@@ -1,16 +1,36 @@
 package ingestion.service.domain.service
 
 import cats.effect._
-import software.amazon.awssdk.services.s3.model.Bucket
+import cats.implicits._
+import software.amazon.awssdk.services.s3.model.{ Bucket, CreateBucketRequest }
 import ingestion.service.adapter.s3.S3Client
-import ingestion.service.domain.service.live.StorageServiceLive
+import org.typelevel.log4cats.{ Logger, SelfAwareStructuredLogger }
+import org.typelevel.log4cats.slf4j.Slf4jLogger
+
+import scala.jdk.CollectionConverters._
 
 trait StorageService[F[_]] {
-  def createBucketIfNotExists(bucketName: String): F[Option[Bucket]]
+  def createBucketIfNotExists(bucketName: String): F[Unit]
 }
 
 object StorageService {
+  implicit private def logger[F[_]: Sync]: SelfAwareStructuredLogger[F] = Slf4jLogger.getLogger[F]
 
   def make[F[_]: Sync](s3Client: S3Client[F]): F[StorageServiceLive[F]] =
     Sync[F].delay(new StorageServiceLive[F](s3Client))
+}
+
+final class StorageServiceLive[F[_]: Sync: Logger](s3Client: S3Client[F]) extends StorageService[F] {
+  override def createBucketIfNotExists(bucketName: String): F[Unit] =
+    findByName(bucketName).flatMap {
+      case Some(_) => Logger[F].info(s"Bucket $bucketName already exists") >> Sync[F].unit
+      case None =>
+        for {
+          _ <- Logger[F].info(s"Creating bucket $bucketName")
+          _ <- s3Client.s3.createBucket(CreateBucketRequest.builder.bucket(bucketName).build())
+        } yield ()
+    }
+
+  private def findByName(bucketName: String): F[Option[Bucket]] =
+    s3Client.s3.listBuckets.map(_.buckets.asScala.find(_.name == bucketName))
 }

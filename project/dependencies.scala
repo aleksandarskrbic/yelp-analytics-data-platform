@@ -14,6 +14,7 @@ object dependencies {
     val pureConfig = "0.16.0"
     val log4cats   = "1.3.1"
     val logback    = "1.2.5"
+    val fuiid      = "0.7.0"
   }
 
   object Libs {
@@ -52,6 +53,8 @@ object dependencies {
       "io.laserdisc" %% "fs2-aws-s3"      % Versions.fs2Aws,
       "io.laserdisc" %% "pure-s3-tagless" % Versions.fs2Aws
     )
+
+    val fuuid = "io.chrisdavenport" %% "fuuid" % Versions.fuiid
 
     val logback       = "ch.qos.logback" % "logback-classic" % Versions.logback % Runtime
     val log4cats      = "org.typelevel"  %% "log4cats-core"  % Versions.log4cats

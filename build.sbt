@@ -1,6 +1,7 @@
 import dependencies.{ Libs, _ }
 
 name := "yelp-analytics-data-platform"
+fork := true
 
 val scalaCoreVersion  = "2.13.6"
 val scalaSparkVersion = "2.12.14"
@@ -38,7 +39,8 @@ val `ingestion-service` = project
       Libs.log4catsSlf4j,
       Libs.http4sDsl,
       Libs.http4sServer,
-      Libs.http4sCirce
+      Libs.http4sCirce,
+      Libs.fuuid
     ) ++ Libs.pureConfig ++ Libs.fs2Aws ++ Libs.fs2AwsS3
   )
 
