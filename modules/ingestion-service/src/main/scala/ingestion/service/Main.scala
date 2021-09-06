@@ -1,18 +1,17 @@
 package ingestion.service
 
 import cats.effect._
-import org.http4s.blaze.server.BlazeServerBuilder
-import org.typelevel.log4cats.slf4j.Slf4jLogger
-import org.typelevel.log4cats.SelfAwareStructuredLogger
-import ingestion.service.config.AppConfig
-import ingestion.service.adapter.http.IngestionRoutes
-import ingestion.service.adapter.s3.S3ClientResource
-import ingestion.service.domain.service.{ IngestionService, StorageService }
 import java.util.concurrent.Executors
 import scala.concurrent.ExecutionContext
+import org.typelevel.log4cats.slf4j.Slf4jLogger
+import org.http4s.blaze.server.BlazeServerBuilder
+import org.typelevel.log4cats.SelfAwareStructuredLogger
+import ingestion.service.config.AppConfig
+import ingestion.service.adapter.s3.S3ClientResource
+import ingestion.service.adapter.http.IngestionRoutes
+import ingestion.service.domain.service.{ IngestionService, StorageService }
 
 object Main extends IOApp {
-
   implicit val logger: SelfAwareStructuredLogger[IO] = Slf4jLogger.getLogger[IO]
 
   def run(args: List[String]): IO[ExitCode] =
@@ -36,5 +35,4 @@ object Main extends IOApp {
         } yield ExitCode.Success
       }
     }
-
 }

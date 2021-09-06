@@ -1,7 +1,7 @@
 package ingestion.service.adapter.s3
 
-import cats.effect._
 import java.net.URI
+import cats.effect._
 import io.laserdisc.pure.s3.tagless.{ Interpreter, S3AsyncClientOp }
 import software.amazon.awssdk.regions.Region
 import software.amazon.awssdk.services.s3.S3AsyncClient
@@ -11,7 +11,6 @@ import ingestion.service.config
 final case class S3ClientWrapper[F[_]](s3: S3AsyncClientOp[F], blocker: Blocker)
 
 object S3ClientResource {
-
   def make[F[_]: Async: ContextShift](s3Config: config.S3): Resource[F, S3ClientWrapper[F]] =
     for {
       blocker             <- Blocker[F]
