@@ -11,6 +11,7 @@ import org.typelevel.log4cats.{ Logger, SelfAwareStructuredLogger }
 import org.typelevel.log4cats.slf4j.Slf4jLogger
 import ingestion.service.adapter.s3.S3ClientWrapper
 import ingestion.service.config
+import ingestion.service.domain.error.IngestionError.UnableToGenerateFilename
 
 trait IngestionService[F[_]] {
   def load(parts: Vector[Part[F]]): F[Fiber[F, Unit]]
@@ -43,7 +44,9 @@ final class IngestionServiceLive[F[_]: Concurrent: ContextShift: Logger](
         }
         .flatMap {
           case Left(error) =>
-            Logger[F].error("Unable to generate filename").flatMap(_ => Sync[F].raiseError(new RuntimeException(error)))
+            Logger[F]
+              .error("Unable to generate filename")
+              .flatMap(_ => Sync[F].raiseError(UnableToGenerateFilename(error)))
           case Right((fileKey, bucketName)) =>
             Logger[F].info(s"File ${fileKey.value} upload to ${bucketName.value} started") >>
               Concurrent[F].start {
