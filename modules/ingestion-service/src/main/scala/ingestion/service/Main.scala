@@ -17,10 +17,10 @@ object Main extends IOApp {
 
   def run(args: List[String]): IO[ExitCode] =
     AppConfig.load[IO].flatMap { appConfig =>
-      S3ClientResource.make[IO](appConfig.s3).use { s3 =>
+      S3ClientResource.make[IO](appConfig.s3).use { s3Client =>
         for {
-          storageService   <- StorageService.make[IO](s3)
-          ingestionService <- IngestionService.make[IO](s3)
+          storageService   <- StorageService.make[IO](s3Client)
+          ingestionService <- IngestionService.make[IO](s3Client, appConfig.s3)
 
           _ <- storageService.createBucketIfNotExists(appConfig.s3.bucketName).start
 

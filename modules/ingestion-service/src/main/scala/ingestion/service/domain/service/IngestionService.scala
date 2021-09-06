@@ -7,9 +7,10 @@ import org.http4s.multipart.Part
 import io.chrisdavenport.fuuid.FUUID
 import eu.timepit.refined.auto._
 import eu.timepit.refined.types.string.NonEmptyString
-import ingestion.service.adapter.s3.S3Client
 import org.typelevel.log4cats.{ Logger, SelfAwareStructuredLogger }
 import org.typelevel.log4cats.slf4j.Slf4jLogger
+import ingestion.service.adapter.s3.S3ClientWrapper
+import ingestion.service.config
 
 trait IngestionService[F[_]] {
   def load(parts: Vector[Part[F]]): F[Fiber[F, Unit]]
@@ -18,12 +19,17 @@ trait IngestionService[F[_]] {
 object IngestionService {
   implicit private def logger[F[_]: Sync]: SelfAwareStructuredLogger[F] = Slf4jLogger.getLogger[F]
 
-  def make[F[_]: Concurrent: ContextShift](s3Client: S3Client[F]): F[IngestionServiceLive[F]] =
-    Sync[F].delay(new IngestionServiceLive[F](s3Client))
+  def make[F[_]: Concurrent: ContextShift](
+    s3Client: S3ClientWrapper[F],
+    s3Config: config.S3
+  ): F[IngestionServiceLive[F]] =
+    Sync[F].delay(new IngestionServiceLive[F](s3Client, s3Config))
 }
 
-final class IngestionServiceLive[F[_]: Concurrent: ContextShift: Logger](s3Client: S3Client[F])
-    extends IngestionService[F] {
+final class IngestionServiceLive[F[_]: Concurrent: ContextShift: Logger](
+  s3Client: S3ClientWrapper[F],
+  s3Config: config.S3
+) extends IngestionService[F] {
   override def load(parts: Vector[Part[F]]): F[Fiber[F, Unit]] =
     S3.create[F](s3Client.s3, s3Client.blocker).flatMap { s3 =>
       parts.headOption
@@ -32,7 +38,7 @@ final class IngestionServiceLive[F[_]: Concurrent: ContextShift: Logger](s3Clien
         .map { name =>
           for {
             filename   <- NonEmptyString.from(name)
-            bucketName <- NonEmptyString.from(s3Client.s3Config.bucketName)
+            bucketName <- NonEmptyString.from(s3Config.bucketName)
           } yield (FileKey(filename), BucketName(bucketName))
         }
         .flatMap {

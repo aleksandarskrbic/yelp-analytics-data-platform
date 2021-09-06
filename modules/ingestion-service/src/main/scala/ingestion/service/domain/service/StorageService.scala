@@ -2,12 +2,11 @@ package ingestion.service.domain.service
 
 import cats.effect._
 import cats.implicits._
+import scala.jdk.CollectionConverters._
 import software.amazon.awssdk.services.s3.model.{ Bucket, CreateBucketRequest }
-import ingestion.service.adapter.s3.S3Client
 import org.typelevel.log4cats.{ Logger, SelfAwareStructuredLogger }
 import org.typelevel.log4cats.slf4j.Slf4jLogger
-
-import scala.jdk.CollectionConverters._
+import ingestion.service.adapter.s3.S3ClientWrapper
 
 trait StorageService[F[_]] {
   def createBucketIfNotExists(bucketName: String): F[Unit]
@@ -16,11 +15,11 @@ trait StorageService[F[_]] {
 object StorageService {
   implicit private def logger[F[_]: Sync]: SelfAwareStructuredLogger[F] = Slf4jLogger.getLogger[F]
 
-  def make[F[_]: Sync](s3Client: S3Client[F]): F[StorageServiceLive[F]] =
+  def make[F[_]: Sync](s3Client: S3ClientWrapper[F]): F[StorageServiceLive[F]] =
     Sync[F].delay(new StorageServiceLive[F](s3Client))
 }
 
-final class StorageServiceLive[F[_]: Sync: Logger](s3Client: S3Client[F]) extends StorageService[F] {
+final class StorageServiceLive[F[_]: Sync: Logger](s3Client: S3ClientWrapper[F]) extends StorageService[F] {
   override def createBucketIfNotExists(bucketName: String): F[Unit] =
     findByName(bucketName).flatMap {
       case Some(_) => Logger[F].info(s"Bucket $bucketName already exists") >> Sync[F].unit
