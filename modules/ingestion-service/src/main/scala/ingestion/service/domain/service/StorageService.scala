@@ -3,13 +3,14 @@ package ingestion.service.domain.service
 import cats.effect._
 import cats.implicits._
 import scala.jdk.CollectionConverters._
-import software.amazon.awssdk.services.s3.model.{ Bucket, CreateBucketRequest }
-import org.typelevel.log4cats.{ Logger, SelfAwareStructuredLogger }
 import org.typelevel.log4cats.slf4j.Slf4jLogger
+import org.typelevel.log4cats.{ Logger, SelfAwareStructuredLogger }
+import software.amazon.awssdk.services.s3.model.{ Bucket, CreateBucketRequest, ListObjectsRequest, S3Object }
 import ingestion.service.adapter.s3.S3ClientWrapper
 
 trait StorageService[F[_]] {
   def createBucketIfNotExists(bucketName: String): F[Unit]
+  def listFiles(bucketName: String): F[List[S3Object]]
 }
 
 object StorageService {
@@ -29,6 +30,9 @@ final class StorageServiceLive[F[_]: Sync: Logger](s3Client: S3ClientWrapper[F])
           _ <- s3Client.s3.createBucket(CreateBucketRequest.builder.bucket(bucketName).build())
         } yield ()
     }
+
+  override def listFiles(bucketName: String): F[List[S3Object]] =
+    s3Client.s3.listObjects(ListObjectsRequest.builder().bucket(bucketName).build()).map(_.contents.asScala.toList)
 
   private def findByName(bucketName: String): F[Option[Bucket]] =
     s3Client.s3.listBuckets.map(_.buckets.asScala.find(_.name == bucketName))

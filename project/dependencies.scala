@@ -18,15 +18,15 @@ object dependencies {
   }
 
   object Libs {
-    def circe(artifact: String): ModuleID     = "io.circe"      %% artifact % Versions.circe
-    def http4s(artifact: String): ModuleID    = "org.http4s"    %% artifact % Versions.http4s
-    def frameless(artifact: String): ModuleID = "org.typelevel" %% artifact % Versions.frameless
+    def getCirce(artifact: String): ModuleID     = "io.circe"      %% artifact % Versions.circe
+    def getHttp4s(artifact: String): ModuleID    = "org.http4s"    %% artifact % Versions.http4s
+    def getFrameless(artifact: String): ModuleID = "org.typelevel" %% artifact % Versions.frameless
 
     val spark = "org.apache.spark" %% "spark-core" % Versions.spark
 
-    val framelessCore    = frameless("frameless-core")
-    val framelessCats    = frameless("frameless-cats")
-    val framelessDataset = frameless("frameless-dataset")
+    val framelessCore    = getFrameless("frameless-core")
+    val framelessCats    = getFrameless("frameless-cats")
+    val framelessDataset = getFrameless("frameless-dataset")
 
     val fs2        = "co.fs2"        %% "fs2-core"    % Versions.fs2
     val cats       = "org.typelevel" %% "cats-core"   % Versions.cats
@@ -37,12 +37,8 @@ object dependencies {
       "com.github.pureconfig" %% "pureconfig-cats-effect2" % Versions.pureConfig
     )
 
-    val circeCore    = circe("circe-core")
-    val circeGeneric = circe("circe-generic")
-
-    val http4sDsl    = http4s("http4s-dsl")
-    val http4sServer = http4s("http4s-blaze-server")
-    val http4sCirce  = http4s("http4s-circe")
+    val circe  = Seq(getCirce("circe-core"), getCirce("circe-generic"))
+    val http4s = Seq(getHttp4s("http4s-dsl"), getHttp4s("http4s-blaze-server"), getHttp4s("http4s-circe"))
 
     val fs2Aws = Seq(
       "io.laserdisc" %% "fs2-aws"      % Versions.fs2Aws,

@@ -37,11 +37,8 @@ val `ingestion-service` = project
       Libs.logback,
       Libs.log4cats,
       Libs.log4catsSlf4j,
-      Libs.http4sDsl,
-      Libs.http4sServer,
-      Libs.http4sCirce,
       Libs.fuuid
-    ) ++ Libs.pureConfig ++ Libs.fs2Aws ++ Libs.fs2AwsS3
+    ) ++ Libs.circe ++ Libs.http4s ++ Libs.pureConfig ++ Libs.fs2Aws ++ Libs.fs2AwsS3
   )
 
 val `query-service` = project
@@ -51,9 +48,6 @@ val `query-service` = project
   .settings(
     libraryDependencies := Seq(
       Libs.cats,
-      Libs.catsEffect,
-      Libs.http4sDsl,
-      Libs.http4sServer,
-      Libs.http4sCirce
-    ) ++ Libs.pureConfig ++ Libs.fs2Aws ++ Libs.fs2AwsS3
+      Libs.catsEffect
+    ) ++ Libs.circe ++ Libs.http4s ++ Libs.pureConfig ++ Libs.fs2Aws ++ Libs.fs2AwsS3
   )
